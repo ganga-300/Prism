@@ -121,3 +121,10 @@ result = check_registration(name)
 print("Registration:", result)
 
 
+
+
+from utils.founder import check_founder_credibility
+
+directors = ["Rajat Gupta"]
+result = check_founder_credibility("Galaxy.ai", directors)
+print(result)

@@ -166,7 +166,3 @@ Review data:
             "confidence": 0.2
         }
     
-from utils.company import check_hiring_history
-
-result = check_hiring_history("Infosys")
-print(result)
