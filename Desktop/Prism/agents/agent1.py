@@ -5,6 +5,15 @@ from datetime import datetime
 from utils.scraper import scrape_url, extract_job_data, normalize_date
 from utils.search import search
 
+
+def validate_url(url: str) -> dict:
+    if not url or not url.startswith("http"):
+        return {
+            "valid": False,
+            "reason": "Please paste a valid URL."
+        }
+    return {"valid": True, "reason": None}
+
 IST = pytz.timezone("Asia/Kolkata")
 
 PLATFORMS = ["naukri.com", "internshala.com", "unstop.com", "linkedin.com/jobs"]
