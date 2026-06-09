@@ -1,6 +1,7 @@
 import os
 from firecrawl import FirecrawlApp
 from dotenv import load_dotenv
+import hashlib
 
 load_dotenv()
 
@@ -36,7 +37,17 @@ import json
 
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
+
+
+llm_cache = {}
+
 def extract_job_data(markdown: str) -> dict:
+
+    cache_key = hashlib.md5(markdown.encode('utf-8')).hexdigest()
+
+    if cache_key in llm_cache:
+        return llm_cache[cache_key]
+    
     try:
         prompt = f"""
 Extract the following information from this job posting and return ONLY a JSON object, nothing else:
@@ -64,9 +75,12 @@ Job posting:
         raw = raw.replace("```json", "").replace("```", "").strip()
         data = json.loads(raw)
         data["posted_date"] = normalize_date(data.get("posted_date"))
+
+        llm_cache[cache_key] = data
         return data
+       
     
-    
+
     except Exception as e:
         return {
             "error": str(e),
