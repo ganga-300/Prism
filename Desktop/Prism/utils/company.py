@@ -95,5 +95,78 @@ Data:
             "confidence": 0.3
         }
     
-result = check_registration("Infosys Limited")
+
+def check_hiring_history(company_name: str) -> dict:
+    queries = [
+        f'"{company_name}" reviews site:ambitionbox.com',
+        f'"{company_name}" reviews site:glassdoor.co.in',
+        f'"{company_name}" internship experience review'
+    ]
+
+    # Step 1 — run all searches and combine results
+    combined_text = ""
+    for query in queries:
+        results = search(query)
+        for r in results[:2]:
+            combined_text += r.get("snippet", "") + "\n"
+
+    if not combined_text.strip():
+        return {
+            "hiring_history_found": False,
+            "total_reviews": 0,
+            "intern_reviews": 0,
+            "average_rating": None,
+            "red_flags": [],
+            "positive_signals": [],
+            "confidence": 0.1
+        }
+
+    # Step 2 — Groq synthesizes everything
+    try:
+        prompt = f"""
+You are analyzing company reviews to determine if this company actually hires people
+and whether they are a legitimate employer.
+
+Extract and return ONLY a JSON object:
+{{
+    "hiring_history_found": true or false,
+    "total_reviews": number or 0,
+    "intern_reviews": number or 0,
+    "average_rating": number between 1-5 or null,
+    "red_flags": ["flag1", "flag2"],
+    "positive_signals": ["signal1", "signal2"]
+}}
+
+Focus on: delayed salaries, no real work, fake company signals, good learning, real projects.
+Return empty arrays if nothing found.
+
+Company: {company_name}
+Review data:
+{combined_text[:3000]}
+"""
+        response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1
+        )
+        raw = response.choices[0].message.content.strip()
+        raw = raw.replace("```json", "").replace("```", "").strip()
+        data = json.loads(raw)
+        data["confidence"] = 0.7 if data["hiring_history_found"] else 0.3
+        return data
+
+    except:
+        return {
+            "hiring_history_found": False,
+            "total_reviews": 0,
+            "intern_reviews": 0,
+            "average_rating": None,
+            "red_flags": [],
+            "positive_signals": [],
+            "confidence": 0.2
+        }
+    
+from utils.company import check_hiring_history
+
+result = check_hiring_history("Infosys")
 print(result)
