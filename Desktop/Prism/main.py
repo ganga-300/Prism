@@ -112,46 +112,59 @@
 # changes = detect_changes(jd_internshala, jd_linkedin, "internshala", "linkedin")
 # print(changes)
 
-from utils.company import normalize_company_name, check_registration
+# from utils.company import normalize_company_name, check_registration
 
-name = normalize_company_name("Infosys")
-print("Normalized:", name)
+# name = normalize_company_name("Infosys")
+# print("Normalized:", name)
 
-result = check_registration(name)
-print("Registration:", result)
-
-
+# result = check_registration(name)
+# print("Registration:", result)
 
 
-from utils.founder import check_founder_credibility
-
-directors = ["Rajat Gupta"]
-result = check_founder_credibility("Galaxy.ai", directors)
-print(result)
 
 
-from utils.scraper import scrape_url, extract_job_data
-from agents.agent3 import run as agent3_run
+# from utils.founder import check_founder_credibility
 
-url = "https://internshala.com/internship/detail/work-from-home-full-stack-development-internship-at-queens-of-change-foundation1780920146"
-
-scraped = scrape_url(url)
-job_data = extract_job_data(scraped["content"])
-print("Job Data:", job_data)
-
-result = agent3_run(job_data)
-print("\nAgent 3 Result:")
-print(result)
+# directors = ["Rajat Gupta"]
+# result = check_founder_credibility("Galaxy.ai", directors)
+# print(result)
 
 
-from utils.scraper import scrape_url, extract_job_data
-from agents.agent2 import run as agent2_run
+# from utils.scraper import scrape_url, extract_job_data
+# from agents.agent3 import run as agent3_run
 
-url = "https://internshala.com/internship/detail/work-from-home-full-stack-development-internship-at-queens-of-change-foundation1780920146"
+# url = "https://internshala.com/internship/detail/work-from-home-full-stack-development-internship-at-queens-of-change-foundation1780920146"
 
-scraped = scrape_url(url)
-job_data = extract_job_data(scraped["content"])
+# scraped = scrape_url(url)
+# job_data = extract_job_data(scraped["content"])
+# print("Job Data:", job_data)
 
-result = agent2_run(url, job_data, [])
-print("\nAgent 2 Result:")
+# result = agent3_run(job_data)
+# print("\nAgent 3 Result:")
+# print(result)
+
+
+# from utils.scraper import scrape_url, extract_job_data
+# from agents.agent2 import run as agent2_run
+
+# url = "https://internshala.com/internship/detail/work-from-home-full-stack-development-internship-at-queens-of-change-foundation1780920146"
+
+# scraped = scrape_url(url)
+# job_data = extract_job_data(scraped["content"])
+
+# result = agent2_run(url, job_data, [])
+# print("\nAgent 2 Result:")
+# print(result)
+
+
+
+from agents.agent4 import run as agent4_run
+
+job_data = {
+    "company_name": "Infosys",
+    "role_title": "Frontend Developer Intern"
+}
+
+result = agent4_run(job_data)
+print("\nAgent 4 Result:")
 print(result)
