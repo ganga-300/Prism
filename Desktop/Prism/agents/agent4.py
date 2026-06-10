@@ -1,9 +1,63 @@
 import os
+from groq import Groq
 from utils.scraper import scrape_url
 from utils.search import search
 from dotenv import load_dotenv
 
 load_dotenv()
+
+groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+def find_careers_page(company: str) -> dict:
+    queries = [
+        f'"{company}" careers internship India',
+        f'"{company}" jobs opening intern India',
+        f'"{company}" hiring freshers India'
+    ]
+    
+    for query in queries:
+        results = search(query)
+        if results:
+            return {
+                "found": True,
+                "url": results[0]["link"]
+            }
+    
+    return {"found": False, "url": None}
+
+def check_role_on_page(content: str, role: str, company: str) -> dict:
+    try:
+        prompt = f"""
+You are checking if a company's careers page has an opening similar to a specific role.
+
+Company: {company}
+Role looking for: {role}
+
+Careers page content:
+{content[:2000]}
+
+Answer ONLY with a JSON object:
+{{
+    "role_found": true or false,
+    "reason": "one line explanation",
+    "similar_roles_found": ["role1", "role2"]
+}}
+"""
+        response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1
+        )
+        import json
+        raw = response.choices[0].message.content.strip()
+        raw = raw.replace("```json", "").replace("```", "").strip()
+        return json.loads(raw)
+    except:
+        return {
+            "role_found": False,
+            "reason": "Could not analyze careers page",
+            "similar_roles_found": []
+        }
 
 def run(job_data: dict) -> dict:
     company = job_data.get("company_name")
@@ -15,12 +69,11 @@ def run(job_data: dict) -> dict:
             "reason": "Missing company or role",
             "confidence": 0.0
         }
-    
 
     # Step 1 — find careers page
-    results = search(f'"{company}" official careers page jobs opening')
-    
-    if not results:
+    careers = find_careers_page(company)
+
+    if not careers["found"]:
         return {
             "status": "partial",
             "careers_page_found": False,
@@ -28,37 +81,29 @@ def run(job_data: dict) -> dict:
             "reason": "Could not find company careers page",
             "confidence": 0.2
         }
-    
-    careers_url = results[0]["link"]
-
 
     # Step 2 — scrape careers page
-    scraped = scrape_url(careers_url)
-    
+    scraped = scrape_url(careers["url"])
+
     if not scraped["success"] or not scraped["content"]:
         return {
             "status": "partial",
             "careers_page_found": True,
-            "careers_url": careers_url,
+            "careers_url": careers["url"],
             "role_found_on_careers_page": False,
             "reason": "Could not scrape careers page",
             "confidence": 0.3
         }
 
-    # Step 3 — check if role exists on page
-    content_lower = scraped["content"].lower()
-    role_lower = role.lower()
-    
-    # check for full role title or key words from role
-    role_words = [w for w in role_lower.split() if len(w) > 3]
-    words_found = sum(1 for w in role_words if w in content_lower)
-    role_found = words_found >= len(role_words) * 0.6
+    # Step 3 — Groq checks if role exists
+    result = check_role_on_page(scraped["content"], role, company)
 
     return {
         "status": "success",
         "careers_page_found": True,
-        "careers_url": careers_url,
-        "role_found_on_careers_page": role_found,
-        "match_score": round(words_found / max(len(role_words), 1), 2),
-        "confidence": 0.8 if role_found else 0.7
+        "careers_url": careers["url"],
+        "role_found_on_careers_page": result["role_found"],
+        "reason": result["reason"],
+        "similar_roles_found": result["similar_roles_found"],
+        "confidence": 0.8 if result["role_found"] else 0.7
     }
