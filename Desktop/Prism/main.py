@@ -128,3 +128,30 @@ from utils.founder import check_founder_credibility
 directors = ["Rajat Gupta"]
 result = check_founder_credibility("Galaxy.ai", directors)
 print(result)
+
+
+from utils.scraper import scrape_url, extract_job_data
+from agents.agent3 import run as agent3_run
+
+url = "https://internshala.com/internship/detail/work-from-home-full-stack-development-internship-at-queens-of-change-foundation1780920146"
+
+scraped = scrape_url(url)
+job_data = extract_job_data(scraped["content"])
+print("Job Data:", job_data)
+
+result = agent3_run(job_data)
+print("\nAgent 3 Result:")
+print(result)
+
+
+from utils.scraper import scrape_url, extract_job_data
+from agents.agent2 import run as agent2_run
+
+url = "https://internshala.com/internship/detail/work-from-home-full-stack-development-internship-at-queens-of-change-foundation1780920146"
+
+scraped = scrape_url(url)
+job_data = extract_job_data(scraped["content"])
+
+result = agent2_run(url, job_data, [])
+print("\nAgent 2 Result:")
+print(result)
