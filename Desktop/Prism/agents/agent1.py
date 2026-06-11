@@ -6,6 +6,12 @@ from datetime import datetime
 from utils.scraper import scrape_url, extract_job_data, normalize_date
 from utils.search import search
 
+import re
+
+def is_job_posting_url(url: str) -> bool:
+    # Job posting URLs almost always contain a numeric ID
+    return bool(re.search(r'\d{6,}', url))
+
 IST = pytz.timezone("Asia/Kolkata")
 PLATFORMS = ["naukri.com", "internshala.com", "unstop.com"]
 
@@ -17,6 +23,20 @@ def validate_url(url: str) -> dict:
         }
     return {"valid": True, "reason": None}
 
+def is_relevant_url(url: str, snippet: str, company: str) -> bool:
+    company_lower = company.lower()
+    # Check if company name appears in URL or snippet
+    url_lower = url.lower()
+    snippet_lower = snippet.lower()
+    
+    # Get first word of company name as minimum match
+    company_words = [w.lower() for w in company.split() if len(w) > 3]
+    
+    matches = sum(1 for w in company_words if w in snippet_lower or w in url_lower)
+    return matches >= 1
+
+
+
 def find_cross_platform_urls(company: str, role: str) -> list:
     urls_found = []
     for platform in PLATFORMS:
@@ -25,7 +45,7 @@ def find_cross_platform_urls(company: str, role: str) -> list:
         for result in results[:2]:
             link = result.get("link", "")
             snippet = result.get("snippet", "")
-            if link:
+            if link and is_relevant_url(link, snippet, company) and is_job_posting_url(link):
                 urls_found.append({
                     "platform": platform,
                     "url": link,

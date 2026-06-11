@@ -171,43 +171,58 @@
 
 
 
+# from utils.scraper import scrape_url, extract_job_data
+# from agents.agent1 import run as agent1_run
+# from agents.agent2 import run as agent2_run
+# from agents.agent3 import run as agent3_run
+# from agents.agent4 import run as agent4_run
+# from agents.verdict import run as verdict_run
+
+# url = "https://internshala.com/internship/detail/work-from-home-full-stack-development-internship-at-queens-of-change-foundation1780920146"
+
+# # Step 1 — scrape and extract
+# scraped = scrape_url(url)
+# job_data = extract_job_data(scraped["content"])
+# print("Job Data:", job_data)
+
+# # Step 2 — run all agents
+# agent1_result = agent1_run(url, job_data)
+# agent2_result = agent2_run(url, job_data, [])
+# agent3_result = agent3_run(job_data)
+# agent4_result = agent4_run(job_data)
+
+# print("\nAgent 1:", agent1_result)
+# print("\nAgent 2:", agent2_result)
+# print("\nAgent 3:", agent3_result)
+# print("\nAgent 4:", agent4_result)
+
+# # Step 3 — verdict
+# agent_outputs = {
+#     "agent1": agent1_result,
+#     "agent2": agent2_result,
+#     "agent3": agent3_result,
+#     "agent4": agent4_result
+# }
+
+# verdict = verdict_run(agent_outputs, job_data)
+# print("\n=== FINAL VERDICT ===")
+# print("Ghost Probability:", verdict["ghost_probability"])
+# print("Verdict:", verdict["verdict"])
+# print("Summary:", verdict["summary"])
+# print("Signals:", len(verdict["signals"]), "signals found")
+# print("Confidence:", verdict["overall_confidence"])
+
+
+
 from utils.scraper import scrape_url, extract_job_data
 from agents.agent1 import run as agent1_run
-from agents.agent2 import run as agent2_run
-from agents.agent3 import run as agent3_run
-from agents.agent4 import run as agent4_run
-from agents.verdict import run as verdict_run
 
 url = "https://internshala.com/internship/detail/work-from-home-full-stack-development-internship-at-queens-of-change-foundation1780920146"
 
-# Step 1 — scrape and extract
 scraped = scrape_url(url)
 job_data = extract_job_data(scraped["content"])
 print("Job Data:", job_data)
 
-# Step 2 — run all agents
-agent1_result = agent1_run(url, job_data)
-agent2_result = agent2_run(url, job_data, [])
-agent3_result = agent3_run(job_data)
-agent4_result = agent4_run(job_data)
-
-print("\nAgent 1:", agent1_result)
-print("\nAgent 2:", agent2_result)
-print("\nAgent 3:", agent3_result)
-print("\nAgent 4:", agent4_result)
-
-# Step 3 — verdict
-agent_outputs = {
-    "agent1": agent1_result,
-    "agent2": agent2_result,
-    "agent3": agent3_result,
-    "agent4": agent4_result
-}
-
-verdict = verdict_run(agent_outputs, job_data)
-print("\n=== FINAL VERDICT ===")
-print("Ghost Probability:", verdict["ghost_probability"])
-print("Verdict:", verdict["verdict"])
-print("Summary:", verdict["summary"])
-print("Signals:", len(verdict["signals"]), "signals found")
-print("Confidence:", verdict["overall_confidence"])
+result = agent1_run(url, job_data)
+print("\nAgent 1 Result:")
+print(result)
