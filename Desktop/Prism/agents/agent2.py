@@ -36,16 +36,15 @@ def run(job_url: str, job_data: dict, platform_urls: list) -> dict:
 
     # Step 2 — find URLs on other platforms if not provided
     if not platform_urls:
-        for platform in PLATFORMS:
-            if platform not in job_url:
-                results = search(f'"{company}" "{role}" site:{platform}')
-                for r in results[:1]:
-                    if r.get("link"):
-                        platform_urls.append({
-                            "platform": platform,
-                            "url": r["link"],
-                            "snippet": r.get("snippet", "")
-                        })
+       return {
+        "status": "partial",
+        "clone_detected": False,
+        "reason": "No cross-platform URLs provided from Agent 1",
+        "platforms_compared": 0,
+        "similarity_scores": [],
+        "changes_detected": [],
+        "confidence": 0.2
+    }
 
     # Step 3 — compare JDs
     other_jds = []
