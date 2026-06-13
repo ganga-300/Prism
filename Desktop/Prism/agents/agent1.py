@@ -37,7 +37,7 @@ def is_relevant_url(url: str, snippet: str, company: str) -> bool:
 
 
 
-def find_cross_platform_urls(company: str, role: str) -> list:
+def find_cross_platform_urls(company: str, role: str,job_url: str) -> list:
     urls_found = []
     for platform in PLATFORMS:
         query = f'"{company}" "{role}" site:{platform}'
@@ -45,7 +45,7 @@ def find_cross_platform_urls(company: str, role: str) -> list:
         for result in results[:2]:
             link = result.get("link", "")
             snippet = result.get("snippet", "")
-            if link and is_relevant_url(link, snippet, company) and is_job_posting_url(link):
+            if link and link != job_url and is_relevant_url(link, snippet, company) and is_job_posting_url(link):
                 urls_found.append({
                     "platform": platform,
                     "url": link,
@@ -100,7 +100,7 @@ def run(job_url: str, job_data: dict) -> dict:
         }
 
     # Step 1 — find URLs across platforms
-    cross_platform_urls = find_cross_platform_urls(company, role)
+    cross_platform_urls = find_cross_platform_urls(company, role, job_url)
 
     # Step 2 — scrape each URL for real dates
     cross_platform_dates = []
@@ -186,3 +186,5 @@ def run(job_url: str, job_data: dict) -> dict:
         "confidence": round(confidence, 2),
         "cross_platform_urls": cross_platform_urls
     }
+
+

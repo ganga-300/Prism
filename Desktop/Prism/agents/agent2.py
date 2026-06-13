@@ -9,6 +9,22 @@ load_dotenv()
 
 PLATFORMS = ["naukri.com", "internshala.com", "unstop.com"]
 
+def is_clone(score: float, original_url: str, other_url: str, company: str, snippet: str) -> bool:
+    same_platform = any(
+        p in original_url and p in other_url
+        for p in ["internshala", "naukri", "unstop"]
+    )
+    company_confirmed = any(
+        word.lower() in snippet.lower()
+        for word in company.split() if len(word) > 3
+    )
+    if same_platform and company_confirmed:
+        return score > 0.65
+    elif company_confirmed:
+        return score > 0.75
+    else:
+        return score > 0.85
+
 def extract_jd_text(content: str) -> str:
     # Return first 2000 chars as JD text
     return content[:2000] if content else ""
@@ -94,7 +110,7 @@ def run(job_url: str, job_data: dict, platform_urls: list) -> dict:
             "similarity": score
         })
 
-        if score > 0.85:
+        if is_clone(score, job_url, item.get("url", ""), company, item.get("snippet", "")):
             clone_detected = True
             changes = detect_changes(original_jd, other_jds[i], "original", platform)
             changes_detected.extend(changes)
