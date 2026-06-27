@@ -27,6 +27,23 @@ CHECK 2 — Duplicate/clone detection across platforms:
 CHECK 3 — Company investigation:
 {json.dumps(a3, indent=2)}
 
+CALIBRATION GUIDANCE — you must use all three verdict options proportionally, not default to caution:
+
+- "yes" — Use this when the evidence is genuinely clean: real hiring history, no name/description 
+  mismatches, no resume-farming pattern, nothing inconsistent. Don't withhold "yes" just because 
+  some minor things "could not be checked" — absence of extra confirmation is not a red flag by itself.
+
+- "no" — Use this when MULTIPLE serious, specific red flags stack together. For example: a company 
+  name that doesn't match its own "about" description, AND a near-zero hire rate over many postings 
+  (resume farming), AND a LinkedIn/online identity that points to a completely different company. 
+  When CHECK 3 has already independently concluded "no" or flagged 3+ serious suspected issues with 
+  low confidence, you should generally agree with "no" rather than softening it to "verify_first" — 
+  Check 3 did the deep investigation, trust its conclusion unless Check 1 or Check 2 contradict it.
+
+- "verify_first" — Reserve this for genuine middle-ground cases: one or two specific inconsistencies, 
+  or solid data that's simply incomplete. Don't use this as a default safe choice when the evidence 
+  actually points clearly to "yes" or "no".
+
 Based on ALL of this, return ONLY a JSON object:
 {{
     "worth_applying": "yes" or "verify_first" or "no",
