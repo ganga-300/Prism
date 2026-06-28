@@ -16,3 +16,30 @@ def analyze_job(url: str) -> dict:
     job_markdown = scraped["content"]
     agent1_result = agent1_run(url, job_data)
     platform_urls = agent1_result.get("cross_platform_urls", [])
+    agent2_result = agent2_run(url, job_data, platform_urls)
+    agent3_result = agent3_run(job_data, url, job_markdown)
+
+    agent_outputs = {
+        "agent1": agent1_result,
+        "agent2": agent2_result,
+        "agent3": agent3_result
+    }
+
+    verdict = verdict_run(agent_outputs, job_data)
+
+    return {
+        "status": "success",
+        "job": {
+            "company_name": job_data.get("company_name"),
+            "role_title": job_data.get("role_title"),
+            "location": job_data.get("location"),
+            "stipend": job_data.get("stipend")
+        },
+        "verdict": verdict
+    }
+
+
+if __name__ == "__main__":
+    import json
+    result = analyze_job("https://internshala.com/internship/detail/work-from-home-web-development-internship-at-careernest1781772110")
+    print(json.dumps(result, indent=2))
