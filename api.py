@@ -1,3 +1,13 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+
+class AnalyzeRequest(BaseModel):
+    url: str
+
+
+
+
 from utils.scraper import scrape_url, extract_job_data
 from agents.agent1 import run as agent1_run
 from agents.agent2 import run as agent2_run
@@ -38,8 +48,8 @@ def analyze_job(url: str) -> dict:
         "verdict": verdict
     }
 
+app = FastAPI()
 
-if __name__ == "__main__":
-    import json
-    result = analyze_job("https://internshala.com/internship/detail/work-from-home-web-development-internship-at-careernest1781772110")
-    print(json.dumps(result, indent=2))
+@app.post("/analyze")
+def analyze(request: AnalyzeRequest):
+    return analyze_job(request.url)
